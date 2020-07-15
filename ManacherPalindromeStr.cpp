@@ -55,87 +55,92 @@ string normalPalindromeCalculate(string sentence){
 }
 
 
-/*
-Manacher最大回文子串算法实现
-*/
-class Solution{
-    public:
-        //字符串预处理 用#填充字符串空隙 以#开头和结尾 #字符的数目为 n-1+2 总长度为2n+1
-        string preProcess(string sentence){
-            int length = sentence.size();
-            if(!length){
-                return "";
-            }
-            char end = '#';
-            string newStr;
-            for(int i=0;i<length;i++){
-                newStr.push_back('#');
-                newStr.push_back(sentence[i]);
-            }
-            newStr.push_back(end);
-            return newStr;
+
+//Manacher算法计算字符串的最大回文字串
+
+//字符串预处理 将字符串(size = n)处理成 #a#b#c# 的这种形式 以# 开头和结尾 字符中间用#填充
+//这样保证的是新字符串字符的个数是奇数个(size = n+ (n-1)+2 = 2n+1)个 方便利用回文字符串的对称性
+//还有一条重要的性质 newIndex/2 =oldIndex 即 新字符串char<a>的下标是原始字符串char<a>下标的2倍
+string preProcessStr(string sentence){
+    int length = sentence.size();
+    if(length==0){
+        return "";
+    }
+    string newStr = "";
+    for(int i=0;i<length;i++){
+        newStr+='#';
+        newStr+=sentence[i];
+    }
+    newStr+='#';
+    return newStr;
+}
+//manacher算法 计算字符串中的最大回文子串
+string maxPalindromeCalculateByManacherAlgorithm(string sentence){
+    int s_len = sentence.size();
+    if(s_len<2){
+        return sentence;
+    }
+    //预处理字符串
+    string fix_str = preProcessStr(sentence);
+    int fix_len = 2*s_len+1;//预处理之后字符串的长度
+
+    int maxLen = 1;//最大回文子串的长度
+    int start = 0;//最大回文子串的开始索引
+
+    vector<int> p(fix_len,0);//定义新字符串索引对应的p数组 p[i]代表 以i为中心向两边扩散的最大扩散长度spread 
+    int maxRight = 0;//扫描过程中 最右边能达到的最大索引
+    int center = 0; //扫描过程中 回文子串的中心索引
+
+    for (int i = 0; i < fix_len; i++)
+    {
+        /* code */
+        //i<maxRight的时候才可以利用中心对称性质 寻找镜像 i>=maxRight的时候只能进行中心扩展了
+        if(i<maxRight){
+            int mirror = center*2-i;//mirror是i关于 center的镜像坐标 center-mirror=i-center
+            /*由于回文字符串的对称性质 我们可以利用i关于center对称的镜像坐标来求p[i] 因为我们是从左到右扫描的
+            maxRight和center也在不断的更新
+            1 当p[mirror]<maxRright p[i]=p[mirror]=d
+            2 当p[mirror]=maxRright 需要从左侧的 i-p[mirror]-1和maxRright+1 继续向两侧扩散对比寻找 最大扩展长度
+            3 当p[mirror]>maxRright 时p[i]=maxRright-i 简单证明
+            p[i]>maxRight-i =>关于i对称 S[i-d-1]=S[maxRright+1] 
+            =>关于center对称 S[i-d-1]=S[mirror+d+1] =>关于mirror对称 S[mirror+d+1]=S[mirror-d-1]
+            => S[maxRight+1]=S[mirror-d-1] 这说明关于center的最大回文长度是可以加1 maxRight=maxRright+1
+            这与现在maxRight所在的位置矛盾 所以 p[i]最大值也就是maxRright-i
+            */
+           p[i]=min(maxRight-i,p[mirror]);//综上所述 我们取p[i]的最小值 然后在这个最小值的基础上向两侧扩展
+    
         }
-        //Manacher最大回文字串计算
-        string manacherPalindromeCalculate(string sentense){
-            int len = sentense.size();
-            if(len<2){
-                return sentense;
-            }
-            string fixStr = preProcess(sentense);//获取预处理之后的字符串
-            int fixLen = 2*len+1;
-
-            //数组p[]记录扫描过的回文子串信息 p[i]代表以i为中心的最大扩散距离 
-            //也就是原始字符串中以i为中心回文字串的长度
-            vector<int> p(fixLen,0);//初始化为0
-            int maxRight = 0;//扫描过程中 回文子串右侧可扩展的最大索引
-            int center = 0;//扫描过程中 回文子串中心对称索引值
-
-            //当前最大扩散步数 其值等于原始字符串最大回文子串长度
-            int maxLen =1;
-            //原始最大回文字串 开始索引
-            int start =0;
-            for(int i=0;i<fixLen;i++){
-                if(i<maxRight){
-                    int mirror = 2*center-i;//i 关于center堆成的索引mirror
-                    p[i] = min(maxRight-1,p[mirror]);//Manacher算法的关键
-                }
-                //下一次扩散的左右起点，能扩散的步数直接加到p[i]中
-                int left = i -(p[i]+1);
-                int right = i+(p[i]+1);
-
-                while(left>=0&&right<fixLen&&fixStr[left]==fixStr[right]){
-                    p[i]++;
-                    left--;
-                    right++;
-                }
-
-                //maxRight是遍历过i的i+p[i]的最大者
-                // 如果 maxRight 的值越大，进入上面 i < maxRight 的判断的可能性就越大，这样就可以重复利用之前判断过的回文信息了
-                if(i+p[i] > maxRight){
-                    maxRight = i+p[i];
-                    center = i;
-                }
-
-                if(p[i]>maxLen){
-                    maxLen=p[i];
-                    start = (i-maxLen)/2;
-                }
-            }
-            cout<<"maxLen="<<maxLen<<endl;
-            return sentense.substr(start,start+maxLen);
+        //定义开始中心扩散的左右端点
+        int left = i-p[i]-1;
+        int right = i+p[i]+1;
+        while(left>=0&&right<fix_len&&fix_str[left]==fix_str[right]){//开始扫描 指针不越界 对称字符相等继续循环
+            left--;
+            right++;
+            p[i]++;
         }
-};
- 
 
-int main(){
-    string s = "baab";
-    // s = "ababa";
-    // s = s.substr(0,3);
-    // s = preProcess(s);
-    // cout<<s<<endl;
-    // s = normalPalindromeCalculate(s);
-    Solution solve;
-    s = solve.manacherPalindromeCalculate(s);
-    cout<<s<<endl;
-    return 0;
+        //maxRight是向右侧扩展最大的索引 更新maxRight center;
+        //maxRight越大越容易进入i<maxRight的条件判断 也就是说可以更多的利用已经有的回文字符串信息
+        if(i+p[i]>maxRight){
+            maxRight = i+p[i];
+            center = i;
+        }
+
+        //更新最大回文字符串长度
+        if(p[i]>maxLen){
+            maxLen = p[i];
+            start = (i - maxLen)/2;//原始字符串中 最大回文字串的起始坐标 因为字符串是填充过的 原有字符串的坐标翻倍了
+        }
+    }
+    return sentence.substr(start,start+maxLen);//包含头 不包含尾
+}
+
+
+
+
+int main () {
+    string s = "abababacde";
+    string fixStr = maxPalindromeCalculateByManacherAlgorithm(s);
+    cout<<fixStr<<endl;
+	  return 0;
 }
