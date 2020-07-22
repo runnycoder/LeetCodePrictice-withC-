@@ -11,31 +11,6 @@ class Node{
         Node(){
             next = NULL;
         }
-
-        // int getKey(){
-        //     return key;
-        // }
-        // void setKey(int key){
-        //     this->key = key;
-        // }
-
-        // int getValue(){
-        //     return value;
-        // }
-
-        // void setValue(int value){
-        //     this->value = value;
-        // }
-
-        // void nodeDestroy(Node* nodePtr){
-        //     if(nodePtr==NULL){
-        //         return;
-        //     }else{
-        //         nodeDestroy(nodePtr->next);
-        //     }
-        // }
-
-
 };
 
 class Bucket{
@@ -85,7 +60,6 @@ class Bucket{
                 while(thead){
                     if(thead->key==key){
                         int value = thead->value;
-                        // Node* temp = head;
                         pre->next = thead->next;
                         delete thead;
                         thead = NULL;
@@ -119,9 +93,6 @@ public:
         int index = hash(key);
         cout<<"put key="<<key<<" hash key="<<index<<endl;
         buckets[index].insert(key,value);
-        // Bucket* bucket = &buckets[index];
-        // bucket->insert(key,value);
-        // buckets[index]=bucket;
 
     }
     
@@ -129,19 +100,12 @@ public:
     int get(int key) {
         int index = hash(key);
         return buckets[index].search(key);
-        // Bucket bucket = buckets[index];
-        // return bucket.search(key);
-
     }
     
     /** Removes the mapping of the specified value key if this map contains a mapping for the key */
     void remove(int key) {
         int index = hash(key);
         buckets[index].deleteKey(key);
-        // Bucket* bucket = &buckets[index];
-        // bucket->deleteKey(key);
-        // buckets[index] = bucket;
-
     }
 };
 
