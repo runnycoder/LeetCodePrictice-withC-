@@ -1,5 +1,6 @@
 #include<iostream>
 #include<unordered_set>
+#include<vector>
 using namespace std;
 int main(){
     cout<<"git merge dev_test branch to master branch"<<endl;
@@ -30,4 +31,18 @@ int main(){
         cout<<"hashset is empty"<<endl;
     }
     return 0;
+}
+
+//using hashset to find duplicates
+template <class Type>
+bool findDuplicates(vector<Type>& keys){
+    unordered_set<Type> hashset;
+    for (Type key : keys)
+    {
+        if(hashset.count(key)>0){
+            return true;
+        }
+        hashset.insert(key);
+    }
+    return false;
 }
