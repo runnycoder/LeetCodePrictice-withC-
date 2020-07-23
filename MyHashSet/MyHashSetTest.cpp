@@ -1,40 +1,10 @@
 #include<iostream>
 #include<unordered_set>
 #include<vector>
+#include<string>
+#include<unordered_map>
 using namespace std;
 int getNext(int num);
-int main(){
-    cout<<"git merge dev_test branch to master branch"<<endl;
-    //initialize a has set
-    unordered_set<int> hashset;
-    //insert a new key
-    hashset.insert(3);
-    hashset.insert(2);
-    hashset.insert(1);
-    //delete a key
-    hashset.erase(2);
-    //check if the key is in the hashset
-    if(hashset.count(2)<=0){
-        cout<<"key 2 is not in the hashset."<<endl;
-    }
-    //get the size of hashset
-    cout<<"this hashset size is "<<hashset.size()<<endl;
-
-    for (auto it = hashset.begin(); it != hashset.end(); it++)
-    {
-        /* code */
-        cout<<(*it)<<" ";
-    }
-    cout<<"are int the hashset"<<endl;
-
-    hashset.clear();
-    if(hashset.empty()){
-        cout<<"hashset is empty"<<endl;
-    }
-    int sum = getNext(1234);
-    cout<<sum<<endl;
-    return 0;
-}
 
 //using hashset to find duplicates
 template <class Type>
@@ -134,6 +104,162 @@ bool isHappyByPointer(int n){
     }
     return slowPointer==1;
 }
+/*给定一个整数数组 nums 和一个目标值 target，请你在该数组中找出和为目标值的那 两个 整数，并返回他们的数组下标。
+    你可以假设每种输入只会对应一个答案。但是，数组中同一个元素不能使用两遍。
+    给定 nums = [2, 7, 11, 15], target = 9
+    因为 nums[0] + nums[1] = 2 + 7 = 9
+    所以返回 [0, 1]
+    */
+vector<int> twoSum(vector<int>& nums, int target) {
+    unordered_set<int> resHashSet;
+    vector<int> res;
 
+    
+    for (int i = 0; i < nums.size(); i++)
+    {
+        /* code */
+        int another_num = target-nums[i];
+        for (int j = 0; j < nums.size(); j++)
+            {
+                /* code */
+                if(nums[j]==another_num&&i!=j){
+                    resHashSet.insert(j);
+                    resHashSet.insert(i);
+                }
+        }
+    }
+    
+    
+    for (auto it = resHashSet.begin(); it != resHashSet.end(); it++)
+    {
+        /* code */
+        res.push_back(*it);
+    }
+    
+    
+    return res;
+}
 
+/*
+同构字符串
+给定两个字符串 s 和 t，判断它们是否是同构的。
+
+如果 s 中的字符可以被替换得到 t ，那么这两个字符串是同构的。
+
+所有出现的字符都必须用另一个字符替换，同时保留字符的顺序。两个字符不能映射到同一个字符上，但字符可以映射自己本身。
+
+示例 1:
+
+输入: s = "egg", t = "add"
+输出: true
+示例 2:
+
+输入: s = "foo", t = "bar"
+输出: false
+示例 3:
+
+输入: s = "paper", t = "title"
+输出: true
+说明:
+你可以假设 s 和 t 具有相同的长度。
+abdca
+cefgc
+构建两个映射 初始化value=0 
+每个映射中为字符==index+1
+同样的字符映射值相同
+*/
+bool isIsomorphic(string s, string t) {
+    int slen = s.length();
+    int tlen = t.length();
+    int* smap = new int[128];
+    int* tmap = new int[128];
+    if(slen!=tlen){
+        return false;
+    }else{
+        for (int i = 0; i < slen; i++)
+        {
+            /* code */
+            char c_s=s[i];
+            char c_t=t[i];
+            int sValue = smap[c_s];
+            int tValue = smap[c_t];
+            if(sValue!=tValue){
+                return false;
+            }else{
+                if(sValue==0){//如果未修改过 则赋值映射
+                    smap[c_s]=i+1;
+                    tmap[c_t]=i+1;
+                }
+            }
+           
+        }
+        return true;
+        
+    }
+
+}
+//return subIsIsomorphic(s,t)&&subIsIsomorphic(t,s);
+bool subIsIsomorphic(string s, string t) {
+    int slen = s.length();
+    int tlen = t.length();
+    unordered_map<char,char> hashmap;
+    
+    if(slen!=tlen){
+        return false;
+    }else{
+        for (int i = 0; i < slen; i++)
+        {
+           char c_s=s[i];
+           char c_t=t[i];
+           if(hashmap.count(c_s)>0){
+               if(hashmap[c_s]!=c_t){
+                   return false;
+               }
+           }else{
+               hashmap[c_s]=c_t;
+           }
+           
+        }
+        return true;
+        
+    }
+
+}
+
+int main(){
+    // cout<<"git merge dev_test branch to master branch"<<endl;
+    // //initialize a has set
+    // unordered_set<int> hashset;
+    // //insert a new key
+    // hashset.insert(3);
+    // hashset.insert(2);
+    // hashset.insert(1);
+    // //delete a key
+    // hashset.erase(2);
+    // //check if the key is in the hashset
+    // if(hashset.count(2)<=0){
+    //     cout<<"key 2 is not in the hashset."<<endl;
+    // }
+    // //get the size of hashset
+    // cout<<"this hashset size is "<<hashset.size()<<endl;
+
+    // for (auto it = hashset.begin(); it != hashset.end(); it++)
+    // {
+    //     /* code */
+    //     cout<<(*it)<<" ";
+    // }
+    // cout<<"are int the hashset"<<endl;
+
+    // hashset.clear();
+    // if(hashset.empty()){
+    //     cout<<"hashset is empty"<<endl;
+    // }
+    // int sum = getNext(1234);
+    // cout<<sum<<endl;
+    string s = "ab";
+    string t = "aa";
+    bool flag =  isIsomorphicT(s,t)&&isIsomorphicT(t,s);
+    cout<<flag<<endl;
+    return 0;
+}
 
