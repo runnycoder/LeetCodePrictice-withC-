@@ -409,6 +409,178 @@ vector<int> intersect(vector<int>& nums1, vector<int>& nums2) {
     return false;
  }
 
+ /*
+    字母异位词分组
+    给定一个字符串数组，将字母异位词组合在一起。字母异位词指字母相同，但排列不同的字符串。
+
+    示例:
+
+    输入: ["eat", "tea", "tan", "ate", "nat", "bat"]
+    输出:
+    [
+    ["ate","eat","tea"],
+    ["nat","tan"],
+    ["bat"]
+    ]
+    说明：
+
+    所有输入均为小写字母。
+    不考虑答案输出的顺序。
+
+    思路一：对字符串进行排序 排序结果相同的字符串是同一个异位词组
+    思路二：统计每个字符串中字符出现的次数 字符出现次数相同的字符串是同一个异位词组
+ */
+
+vector<vector<string> > groupAnagrams(vector<string>& strs) {
+    //思路二实现
+    int strs_size = strs.size();
+    vector<vector<string> > res;
+    unordered_map<string,vector<string> > hashmap;
+    for (int i = 0; i < strs_size; i++)
+    {
+        /* code */
+        string str = strs[i];
+        int str_size = str.size();
+        int* chars_index = new int[26]();
+        for (int t = 0; t < 26; t++)
+        {
+            /* code */
+            chars_index[t]=0;
+        }
+        
+        for (int j = 0; j < str_size; j++)
+        {
+            /* code */
+            char ch = str[j];
+            int char_index = ch -'a';
+            int char_index_val = chars_index[char_index];
+            chars_index[char_index] = char_index_val+1;
+        }
+        string key;
+        for (int k = 0; k < 26; k++)
+        {
+            /* code */
+            key+="#";
+            key+=chars_index[k];
+        }
+        if(hashmap.count(key)){
+            hashmap[key].push_back(str);
+        }else{
+            hashmap[key] = vector<string>{str};
+        }
+    }
+
+    for (unordered_map<string,vector<string> >::iterator it = hashmap.begin();
+         it != hashmap.end(); it++)
+    {
+        /* code */
+        // if(it->second.size()>0){
+            res.push_back(it->second);
+        // }
+    }
+    
+
+    return res;
+}
+
+/*
+    判断一个 9x9 的数独是否有效。只需要根据以下规则，验证已经填入的数字是否有效即可。
+
+    数字 1-9 在每一行只能出现一次。
+    数字 1-9 在每一列只能出现一次。
+    数字 1-9 在每一个以粗实线分隔的 3x3 宫内只能出现一次。
+
+    数独部分空格内已填入了数字，空白格用 '.' 表示。
+
+示例 1:
+
+输入:
+[
+  ["5","3",".",".","7",".",".",".","."],
+  ["6",".",".","1","9","5",".",".","."],
+  [".","9","8",".",".",".",".","6","."],
+  ["8",".",".",".","6",".",".",".","3"],
+  ["4",".",".","8",".","3",".",".","1"],
+  ["7",".",".",".","2",".",".",".","6"],
+  [".","6",".",".",".",".","2","8","."],
+  [".",".",".","4","1","9",".",".","5"],
+  [".",".",".",".","8",".",".","7","9"]
+]
+输出: true
+示例 2:
+
+输入:
+[
+  ["8","3",".",".","7",".",".",".","."],
+  ["6",".",".","1","9","5",".",".","."],
+  [".","9","8",".",".",".",".","6","."],
+  ["8",".",".",".","6",".",".",".","3"],
+  ["4",".",".","8",".","3",".",".","1"],
+  ["7",".",".",".","2",".",".",".","6"],
+  [".","6",".",".",".",".","2","8","."],
+  [".",".",".","4","1","9",".",".","5"],
+  [".",".",".",".","8",".",".","7","9"]
+]
+    输出: false
+    解释: 除了第一行的第一个数字从 5 改为 8 以外，空格内其他数字均与 示例1 相同。
+        但由于位于左上角的 3x3 宫内有两个 8 存在, 因此这个数独是无效的。
+    说明:
+
+    一个有效的数独（部分已被填充）不一定是可解的。
+    只需要根据以上规则，验证已经填入的数字是否有效即可。
+    给定数独序列只包含数字 1-9 和字符 '.' 。
+    给定数独永远是 9x9 形式的。
+
+    子数独编号：可以使用 box_index = (row / 3) * 3 + columns / 3，其中 / 是整数除法。
+    
+*/
+
+bool isValidSudoku(vector<vector<char>>& board) {
+        int row_size = board.size();
+        int col_size = board[0].size();
+        vector<unordered_set<char>* > boxes;
+        boxes.resize(9);
+        for (int i = 0; i < 9; i++)
+        {
+            /* code */
+            boxes[i] = new unordered_set<char>();
+        }
+        
+
+        for (int i = 0; i < row_size; i++)
+        {
+            /* code */
+            unordered_set<char> row_set;//第i行重复判断
+            unordered_set<char> col_set;//第i列重复判断
+            for (int j = 0; j < col_size; j++)
+            {
+                /* code */
+                //行列是否有重复值校验
+                char row_value = board[i][j];//行值
+                char col_value = board[j][i];//列值
+                if('.'!=row_value && row_set.count(row_value)){
+                    return false;
+                }
+                if('.'!=col_value && col_set.count(col_value)>0){
+                    return false;
+                }
+                col_set.insert(col_value);
+                row_set.insert(row_value);
+
+                //子矩阵是否有重复值校验
+                int boxe_num = (i/3)*3+j/3;
+                if('.'!=row_value && boxes[boxe_num]->count(row_value)>0){
+                    return false;
+                }else{
+                    boxes[boxe_num]->insert(row_value);
+                }
+            }
+            row_set.clear();
+            col_set.clear();
+        }
+        return true;
+}
+
 int main(){
     // cout<<"git merge dev_test branch to master branch"<<endl;
     // //initialize a has set
@@ -467,14 +639,57 @@ int main(){
     // int index = firstUniqChar(s);
     // cout<<index<<endl;
 
-    vector<int> s;
-    int k =1;
-    s.push_back(1);
-    s.push_back(0);
-    s.push_back(1);
-    s.push_back(1);
-    bool flag = containsNearbyDuplicate(s,k);
-    cout<<flag<<endl;
+    // vector<int> s;
+    // int k =1;
+    // s.push_back(1);
+    // s.push_back(0);
+    // s.push_back(1);
+    // s.push_back(1);
+    // bool flag = containsNearbyDuplicate(s,k);
+    // cout<<flag<<endl;
+
+    // vector<string> param;
+    // param.push_back("eat");
+    // param.push_back("tea");
+    // param.push_back("tan");
+
+    // param.push_back("ate");
+    // param.push_back("nat");
+    // param.push_back("bat");
+
+    // vector<vector<string> > res;
+    // res = groupAnagrams(param);
+    // for (int i = 0; i < res.size(); i++)
+    // {
+    //     /* code */
+    //     vector<string> temp = res[i];
+    //     cout<<"[";
+    //     for (int j = 0; j < temp.size(); j++)
+    //     {
+    //         /* code */
+    //         cout<<temp[j]<<",";
+    //     }
+    //     cout<<"],";
+    // }
+
+    int numRows=9,zone=9;//层数，每层需要的空间
+    vector<vector<char>> vec(numRows, vector<char>());//初始层数，赋值
+    for (int i = 0; i < numRows; i++) {
+        vec[i].resize(zone);
+    }
+
+    vec[0]={'5','3','.','.','7','.','.','.','.'};
+    vec[1]={'6','.','.','1','9','5','.','.','.'};
+    vec[2]={'.','9','8','.','.','.','.','6','.'};
+    vec[3]={'8','.','.','.','6','.','.','.','3'};
+    vec[4]={'4','.','.','8','.','3','.','.','1'};
+    vec[5]={'7','.','.','.','2','.','.','.','6'};
+    vec[6]={'.','6','.','.','.','.','2','8','.'};
+    vec[7]={'.','.','.','4','1','9','.','.','5'};
+    vec[8]={'.','.','.','.','8','.','.','7','9'};
+    
+    bool res = isValidSudoku(vec);
+    cout<<res<<endl;
     return 0;
 }
 
