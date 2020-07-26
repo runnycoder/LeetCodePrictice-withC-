@@ -581,6 +581,89 @@ bool isValidSudoku(vector<vector<char>>& board) {
         return true;
 }
 
+/*
+   宝石与石头
+    给定字符串J 代表石头中宝石的类型，和字符串 S代表你拥有的石头。 S 中每个字符代表了一种你拥有的石头的类型，你想知道你拥有的石头中有多少是宝石。
+
+    J 中的字母不重复，J 和 S中的所有字符都是字母。字母区分大小写，因此"a"和"A"是不同类型的石头。
+
+    示例 1:
+
+    输入: J = "aA", S = "aAAbbbb"
+    输出: 3
+    示例 2:
+
+    输入: J = "z", S = "ZZ"
+    输出: 0
+    注意:
+
+    S 和 J 最多含有50个字母。
+    J 中的字符不重复。 
+*/
+
+int numJewelsInStones(string J, string S) {
+    unordered_set<char> hashset;
+    int count = 0;
+    for (auto ch : J)
+    { 
+        hashset.insert(ch);  
+    }
+
+    for (auto ch : S)
+    {
+        if(hashset.count(ch)>0){
+            count++;
+        }
+    }
+    return count;
+    
+    
+}
+
+/*
+无重复字符的最长子串
+    给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
+
+    示例 1:
+
+    输入: "abcabcbb"
+    输出: 3 
+    解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
+    示例 2:
+
+    输入: "bbbbb"
+    输出: 1
+    解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
+    示例 3:
+
+    输入: "pwwkew"
+    输出: 3
+    解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+        请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+    https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/solution/wu-zhong-fu-zi-fu-de-zui-chang-zi-chuan-by-leetc-2/
+*/
+
+int lengthOfLongestSubstring(string s) {
+    int max_length = 0;
+    unordered_set<char> hashset;
+    int n = s.size();
+    int rk= -1;//右指针的位置
+    for (int i = 0; i < n; i++)
+    {
+        /* code */
+        if(i!=0){//如果不是起始位置 
+            hashset.erase(s[i-1]);//左指针右移一位 集合删除左指针前一个元素
+        }
+        while(rk+1<n&&hashset.count(s[rk+1])<=0){//如果rk+1没有超过界限 且rk+1位置的字符不在非重复集合中
+            hashset.insert(s[rk+1]);
+            rk ++;
+        }
+        max_length = max(max_length,rk-i+1);
+    }
+    return max_length;
+}
+
+
 int main(){
     // cout<<"git merge dev_test branch to master branch"<<endl;
     // //initialize a has set
