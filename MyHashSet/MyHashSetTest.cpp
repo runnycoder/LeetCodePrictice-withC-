@@ -3,6 +3,8 @@
 #include<vector>
 #include<string>
 #include<unordered_map>
+#include<queue>
+#include<algorithm>
 using namespace std;
 int getNext(int num);
 
@@ -661,6 +663,124 @@ int lengthOfLongestSubstring(string s) {
         max_length = max(max_length,rk-i+1);
     }
     return max_length;
+}
+
+
+/*
+四数相加 II
+给定四个包含整数的数组列表 A , B , C , D ,计算有多少个元组 (i, j, k, l) ，使得 A[i] + B[j] + C[k] + D[l] = 0。
+
+为了使问题简单化，所有的 A, B, C, D 具有相同的长度 N，且 0 ≤ N ≤ 500 。所有整数的范围在 -228 到 228 - 1 之间，最终结果不会超过 231 - 1 。
+
+例如:
+
+输入:
+A = [ 1, 2]
+B = [-2,-1]
+C = [-1, 2]
+D = [ 0, 2]
+
+输出:
+2
+
+解释:
+两个元组如下:
+1. (0, 0, 0, 1) -> A[0] + B[0] + C[0] + D[1] = 1 + (-2) + (-1) + 2 = 0
+2. (1, 1, 0, 0) -> A[1] + B[1] + C[0] + D[0] = 2 + (-1) + (-1) + 0 = 0
+*/
+
+int fourSumCount(vector<int>& A, vector<int>& B, vector<int>& C, vector<int>& D) {
+    unordered_map<int,int> hashmap;
+    int res_count = 0;
+    for (int i = 0; i < A.size(); i++)
+    {
+        /* code */
+        for (int j = 0; j < B.size(); j++)
+        {
+            /* code */
+            int sum_a_b = A[i]+B[j];
+            hashmap[sum_a_b]++;
+        }
+        
+    }
+
+     for (int i = 0; i < C.size(); i++)
+    {
+        /* code */
+        for (int j = 0; j < D.size(); j++)
+        {
+            /* code */
+            int sum_c_d_negative = -(C[i]+D[j]);
+            if(hashmap.count(sum_c_d_negative)>0){
+                res_count+=hashmap[sum_c_d_negative];
+            }
+        }
+        
+    }
+    return res_count;
+}
+
+
+/*
+    前 K 个高频元素
+给定一个非空的整数数组，返回其中出现频率前 k 高的元素。
+
+ 
+
+示例 1:
+
+输入: nums = [1,1,1,2,2,3], k = 2
+输出: [1,2]
+示例 2:
+
+输入: nums = [1], k = 1
+输出: [1]
+ 
+
+提示：
+
+你可以假设给定的 k 总是合理的，且 1 ≤ k ≤ 数组中不相同的元素的个数。
+你的算法的时间复杂度必须优于 O(n log n) , n 是数组的大小。
+题目数据保证答案唯一，换句话说，数组中前 k 个高频元素的集合是唯一的。
+你可以按任意顺序返回答案。
+*/
+
+vector<int> topKFrequent(vector<int>& nums, int k) {
+
+    vector<int> res;
+    unordered_map<int,int> hashmap;
+    for (int i = 0; i < nums.size(); i++)
+    {
+        /* code */
+        int key = nums[i];
+        hashmap[key]++;
+    }
+    //最大堆
+    priority_queue<pair<int,int> ,vector<pair<int,int> >,greater<pair<int,int> > > max_queue; 
+    for (unordered_map<int,int>::iterator it = hashmap.begin(); it != hashmap.end(); it++)
+    {
+        /* code */
+        if(max_queue.size()<k){
+            max_queue.push(make_pair(it->second,it->first));
+        }else{
+            if(it->second>max_queue.top().first){
+                max_queue.pop();
+                max_queue.push(make_pair(it->second,it->first));
+            }
+        }
+    }
+    
+    while (!max_queue.empty())
+    {
+        /* code */
+        res.push_back(max_queue.top().second);
+        max_queue.pop();
+    }
+    reverse(res.begin(),res.end());
+    return res;
+    
+    
+    
 }
 
 
