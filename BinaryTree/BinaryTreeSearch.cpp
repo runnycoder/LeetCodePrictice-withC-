@@ -3,6 +3,7 @@
 #include<queue>
 #include<stack>
 #include<algorithm>
+#include<unordered_map>
 using namespace std;
 
 /**
@@ -214,7 +215,7 @@ bool check(TreeNode* p,TreeNode* q){
     return p->val==q->val&&check(p->left,q->right)&&check(p->right,q->left);
 }
 bool isSymmetric(TreeNode* root) {
-    check(root,root);
+   return check(root,root);
 }
 
 //迭代方式实现
@@ -267,10 +268,6 @@ bool checkByStack(TreeNode* p,TreeNode* q){
 示例: 
 给定如下二叉树，以及目标和 sum = 22，
 */
-bool hasPathSum(TreeNode* root, int sum) {
-   return pathSum(root,0,sum);
-}
-
 bool pathSum(TreeNode* root,int parentNum,int sum){
     if(root==NULL){
         return parentNum==sum;
@@ -280,6 +277,11 @@ bool pathSum(TreeNode* root,int parentNum,int sum){
     bool right = pathSum(root->right,current_num,sum);
     return left||right;
 }
+bool hasPathSum(TreeNode* root, int sum) {
+   return pathSum(root,0,sum);
+}
+
+
 //使用队列层序遍历 查找符合条件的叶结点
 bool hasPathSumByQueue(TreeNode* root,int sum){
     if(root==NULL){
@@ -314,15 +316,113 @@ bool hasPathSumByQueue(TreeNode* root,int sum){
     
 }
 
+/*
+    从中序与后序遍历序列构造二叉树
+根据一棵树的中序遍历与后序遍历构造二叉树。
+
+注意:
+你可以假设树中没有重复的元素。
+
+例如，给出
+前序列遍历 preorder = [3,9,20,15,7]
+中序遍历 inorder = [9,3,15,20,7]
+后序遍历 postorder = [9,15,7,20,3]
+
+作者：力扣 (LeetCode)
+链接：https://leetcode-cn.com/leetbook/read/data-structure-binary-tree/xo98qt/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+*/
+int post_index;
+TreeNode* helper(vector<int>& inorder,vector<int>& postorder,unordered_map<int,int>& index_map,int in_left,int in_right){
+    if(in_left>in_right){
+        return NULL;
+    }
+    //pick up post_index element as root
+    int root_val = postorder[post_index];
+    TreeNode* root = new TreeNode(root_val);
+
+    int index = index_map[root_val];
+
+    post_index--;
+    root->right = helper(inorder,postorder,index_map,index+1,in_right);
+    root->left =  helper(inorder,postorder,index_map,in_left,index-1);
+    return root;
+}
+
+TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+    unordered_map<int,int> index_map;
+    for (int i = 0; i < inorder.size(); i++)
+    {
+        /* code */
+        index_map[inorder[i]]=i;
+    }
+    post_index = postorder.size()-1;
+    int in_left = 0;
+    int in_right = inorder.size()-1;
+    return helper(inorder,postorder,index_map,in_left,in_right);  
+}
+
+/*
+    从前序与中序遍历序列构造二叉树
+    根据一棵树的前序遍历与中序遍历构造二叉树。
+
+    注意:
+    你可以假设树中没有重复的元素。
+
+    例如，给出
+
+    前序遍历 preorder = [3,9,20,15,7]
+    中序遍历 inorder = [9,3,15,20,7]
+
+    作者：力扣 (LeetCode)
+    链接：https://leetcode-cn.com/leetbook/read/data-structure-binary-tree/xoei3r/
+    来源：力扣（LeetCode）
+    著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+*/
+int pre_index;
+
+TreeNode* preHelper(vector<int>& preorder,vector<int>& inorder,unordered_map<int,int>& index_map,int in_left,int in_right){
+    if(in_left>in_right){
+        return NULL;
+    }
+    int root_val = preorder[pre_index];
+    TreeNode* root = new TreeNode(root_val);
+
+    pre_index++;
+    int index = index_map[root_val];
+    root->left=preHelper(preorder,inorder,index_map,in_left,index-1);
+    root->right=preHelper(preorder,inorder,index_map,index+1,in_right);
+    return root;
+}
+
+TreeNode* buildTreeFromPre(vector<int>& preorder, vector<int>& inorder) {
+    pre_index = 0;
+    unordered_map<int,int> index_map;
+    for (int i = 0; i < inorder.size(); i++)
+    {
+        /* code */
+        index_map[inorder[i]]=i;
+    }
+    int in_left = 0;
+    int in_right = inorder.size()-1;
+    return preHelper(preorder,inorder,index_map,in_left,in_right);
+    
+}
+
 
 
 
 int main(){
-    TreeNode* root;
-    root->val =2;
-    root->left = new TreeNode(3);
-    root->left->left = new TreeNode(1);
+    // TreeNode* root;
+    // root->val =2;
+    // root->left = new TreeNode(3);
+    // root->left->left = new TreeNode(1);
     // preorderTraversalit(root);
+
+    vector<int> in_order = {9,3,15,20,7};
+    vector<int> post_order = {9,15,7,20,3};
+    TreeNode* root = buildTree(in_order,post_order);
     return 0;
 }
 
