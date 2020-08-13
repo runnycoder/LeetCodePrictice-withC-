@@ -205,6 +205,13 @@ string serialize(TreeNode* root) {
     return result;
 }
 
+string serialize_ll(TreeNode* root) {
+        if (!root) return "X";
+        auto l = "(" + serialize_ll(root->left) + ")";
+        auto r = "(" + serialize_ll(root->right) + ")";
+        return  l + to_string(root->val) + r;
+}
+
 
 
 //辅助函数
@@ -366,11 +373,14 @@ int main(){
     root->right->left = new TreeNode(4);
     root->right->right = new TreeNode(5);
     string result;
-    result =  serialize(root);
-    cout<<result<<endl;
+    // result =  serialize(root);
+    // cout<<result<<endl;
 
-    TreeNode *returnRoot = deserialize(result);
-    result =  serialize(returnRoot);
+    // TreeNode *returnRoot = deserialize(result);
+    // result =  serialize(returnRoot);
+    // cout<<result<<endl;
+
+    result = serialize_ll(root);
     cout<<result<<endl;
 
     // TreeNode* temp;
