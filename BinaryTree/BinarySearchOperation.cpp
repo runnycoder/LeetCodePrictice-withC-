@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<cmath>
 using namespace std;
 /*
 验证二叉搜索树
@@ -148,6 +149,65 @@ TreeNode* deleteNode(TreeNode* root, int key) {
     }
     return root;
 }
+
+/*
+    给定一个二叉树，判断它是否是高度平衡的二叉树。
+
+    本题中，一棵高度平衡二叉树定义为：
+
+    一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过1。
+*/
+
+int treeMaxHigh(TreeNode* root) {
+    if(root==NULL){
+        return 0;
+    }
+    int left_high = treeMaxHigh(root->left);
+    int right_high = treeMaxHigh(root->right);
+    return max(left_high,right_high)+1;
+}
+
+bool isBalanced(TreeNode* root) {
+    if(root==NULL){
+        return true;
+    }
+    int left_high = treeMaxHigh(root->left);
+    int right_high = treeMaxHigh(root->right);
+    if(abs(left_high-right_high)<=1){
+        return isBalanced(root->left)&&isBalanced(root->right);
+    }else{
+        return false;
+    }
+}
+
+/*
+    将有序数组转换为二叉搜索树
+将一个按照升序排列的有序数组，转换为一棵高度平衡二叉搜索树。
+
+本题中，一个高度平衡二叉树是指一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过 1。
+
+作者：力扣 (LeetCode)
+链接：https://leetcode-cn.com/leetbook/read/introduction-to-data-structure-binary-search-tree/xm5go5/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+*/
+//思路 由于给定的序列是从小到大的有序序列 所以每次选择中间的数作为根结点 递归构造左右子树 这样能保证是平衡的
+TreeNode* buildTree(vector<int>& nums,int left,int right){
+    if(left>right){
+        return NULL;
+    }
+    int center = (left+right)/2;
+    TreeNode* root =new TreeNode(nums[center]);
+    root->left = buildTree(nums,left,center-1);
+    root->right = buildTree(nums,center+1,right);
+    return root;
+}
+
+TreeNode* sortedArrayToBST(vector<int>& nums) {
+      return  buildTree(nums,0,nums.size()-1);
+}
+
+
 
 int main(){
     TreeNode* root = new TreeNode(5);
