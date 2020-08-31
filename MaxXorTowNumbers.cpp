@@ -1,6 +1,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include <bitset>
 using namespace std;
 /*
 数组中两个数的最大异或值
