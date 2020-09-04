@@ -123,7 +123,7 @@ public:
     }
 
     //插入新结点 并保持平衡
-    void insertNode(int data,AVLNode*& root){
+    void insertNode(int data,AVLNode* root){
         if(root==NULL){
             root = new AVLNode(data);
         }else{
